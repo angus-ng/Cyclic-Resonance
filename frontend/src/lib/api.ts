@@ -80,6 +80,14 @@ export const getAllGameProfilesOptions = queryOptions({
   staleTime: 1000 * 60 * 5,
 })
 
+export const loadingCreateGameProfilesOptions = queryOptions<{
+  gameProfiles: CreateGameProfile[]
+}>({
+  queryKey: ["loading-create-game-profiles"],
+  queryFn: getAllGameProfiles,
+  staleTime: Infinity,
+})
+
 export async function createGameProfile({
   value,
 }: {

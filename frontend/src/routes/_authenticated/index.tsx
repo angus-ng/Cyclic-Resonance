@@ -54,17 +54,7 @@ function Index() {
 
   return (
     <>
-      <Card className="w-[350px] m-auto">
-        <CardHeader>
-          <CardTitle>Total Spent</CardTitle>
-          <CardDescription>The total amount you've spent</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {totalSpent.isLoading ? "..." : totalSpent.data?.total}
-        </CardContent>
-      </Card>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-      <div className="min-h-screen bg-background text-text p-6 flex flex-col">
+      <div className="min-h-full bg-background text-text p-6 flex flex-col">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Gacha Dashboard</h1>
@@ -77,36 +67,44 @@ function Index() {
         </div>
 
         {/* Profile Cards */}
-        <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-          {data && data.gameProfiles.length > 0 ? (
-            data.gameProfiles.map((profile) => (
-              <Card
-                key={profile.id}
-                className="flex flex-col w-72 p-4 bg-background border border-secondary rounded-lg hover:ring-2 hover:ring-accent transition-all duration-200"
-              >
-                <CardHeader className="text-center">
-                  <h2 className="text-xl font-bold text-text">
-                    {profile.game}
-                  </h2>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center">
-                  <p className="text-secondary">IGN: {profile.ign}</p>
-                  <p className="text-secondary">Game UID: {profile.gameUID}</p>
-                  <p className="text-secondary">Region: {profile.region}</p>
-                </CardContent>
-                <CardFooter className="mt-4 text-sm text-secondary text-center">
-                  Created At: {new Date(profile.createdAt).toLocaleDateString()}
-                </CardFooter>
-              </Card>
-            ))
-          ) : (
-            <div className="flex justify-center items-center w-full h-64">
-              <p className="text-secondary">
-                No profiles found. Create one to get started!
-              </p>
-            </div>
-          )}
-        </div>
+
+        {!isLoading ? (
+          <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+            {data && data.gameProfiles.length > 0 ? (
+              data.gameProfiles.map((profile) => (
+                <Card
+                  key={profile.id}
+                  className="flex flex-col w-72 p-4 bg-background border border-secondary rounded-lg hover:ring-2 hover:ring-accent transition-all duration-200"
+                >
+                  <CardHeader className="text-center">
+                    <h2 className="text-xl font-bold text-text">
+                      {profile.game}
+                    </h2>
+                  </CardHeader>
+                  <CardContent className="flex flex-col items-center">
+                    <p className="text-secondary">IGN: {profile.ign}</p>
+                    <p className="text-secondary">
+                      Game UID: {profile.gameUID}
+                    </p>
+                    <p className="text-secondary">Region: {profile.region}</p>
+                  </CardContent>
+                  <CardFooter className="mt-4 text-sm text-secondary text-center flex justify-center items-center">
+                    Created At:{" "}
+                    {new Date(profile.createdAt).toLocaleDateString()}
+                  </CardFooter>
+                </Card>
+              ))
+            ) : (
+              <div className="flex justify-center items-center w-full h-64">
+                <p className="text-secondary">
+                  No profiles found. Create one to get started!
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div>Loading...</div>
+        )}
         <ProfileModal isOpen={isModalOpen} closeModal={closeModal} />
       </div>
     </>

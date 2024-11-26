@@ -2,13 +2,9 @@ import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import {
-  createGameProfile,
-  // getAllProfilesQueryOptions,
-  // loadingCreateProfileQueryOptions,
-} from "@/lib/api" // Import API functions
-import { createGameProfileSchema } from "@server/sharedTypes" // Import Zod schema for validation
-import { Input } from "@/components/ui/input" // Import custom UI components
+import { createGameProfile, getAllGameProfilesOptions } from "@/lib/api"
+import { createGameProfileSchema } from "@server/sharedTypes"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,7 +14,6 @@ import {
   regions,
 } from "@server/db/schema/gameProfile"
 
-// The modal component itself
 function CreateProfileModal({
   isOpen,
   closeModal,
@@ -28,63 +23,53 @@ function CreateProfileModal({
 }) {
   const queryClient = useQueryClient()
 
-  // Set up the form using TanStack React Form
   const form = useForm({
     validatorAdapter: zodValidator(),
     defaultValues: {
-      game: "Genshin Impact" as GameName, // Default value for game
-      ign: "", // Default empty value for in-game name (IGN)
-      gameUID: "", // Default empty value for game UID
-      region: "America" as RegionName, // Default value for region
-      createdAt: new Date().toISOString(), // Default value for date
+      game: "Genshin Impact" as GameName,
+      ign: "",
+      gameUID: "",
+      region: "America" as RegionName,
+      createdAt: new Date().toISOString(),
     },
     onSubmit: async ({ value }) => {
-      // const existingProfiles = await queryClient.ensureQueryData(
-      //   getAllProfilesQueryOptions
-      // )
+      const existingProfiles = await queryClient.ensureQueryData(
+        getAllGameProfilesOptions
+      )
 
-      // // Set loading state
-      // queryClient.setQueryData(loadingCreateProfileQueryOptions.queryKey, {
-      //   profile: value,
-      // })
+      queryClient.setQueryData(["loading-create-game-profiles"], {
+        gameProfile: value,
+      })
 
       try {
         const newProfile = await createGameProfile({ value })
 
-        // Update the profiles list in the cache
-        // queryClient.setQueryData(getAllProfilesQueryOptions.queryKey, {
-        //   ...existingProfiles,
-        //   profiles: [newProfile, ...existingProfiles.profiles],
-        // })
+        queryClient.setQueryData(getAllGameProfilesOptions.queryKey, {
+          ...existingProfiles,
+          gameProfiles: [newProfile, ...existingProfiles.gameProfiles],
+        })
 
-        // Notify user of success
         toast("Profile Created", {
           description: `Successfully created new profile: ${newProfile.id}`,
         })
 
-        // Close the modal
         closeModal()
+        form.reset()
       } catch (e) {
-        // Error handling
         console.log(e)
         toast("Error", {
           description: "Failed to create new profile",
         })
       } finally {
-        // Reset loading state
-        // queryClient.setQueryData(loadingCreateProfileQueryOptions.queryKey, {})
+        queryClient.setQueryData(["loading-create-game-profiles"], [])
       }
     },
   })
 
-  // If the modal is not open, return null
   if (!isOpen) return null
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      onClick={closeModal}
-    >
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div
         className="bg-background p-6 rounded-lg shadow-lg w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
@@ -103,7 +88,6 @@ function CreateProfileModal({
             form.handleSubmit()
           }}
         >
-          {/* Game Field */}
           <form.Field
             name="game"
             validators={{ onChange: createGameProfileSchema.shape.game }}
@@ -138,8 +122,6 @@ function CreateProfileModal({
               </div>
             )}
           </form.Field>
-
-          {/* IGN Field */}
           <form.Field
             name="ign"
             validators={{ onChange: createGameProfileSchema.shape.ign }}
@@ -166,7 +148,6 @@ function CreateProfileModal({
             )}
           </form.Field>
 
-          {/* Game UID Field */}
           <form.Field
             name="gameUID"
             validators={{ onChange: createGameProfileSchema.shape.gameUID }}
@@ -192,8 +173,6 @@ function CreateProfileModal({
               </>
             )}
           </form.Field>
-
-          {/* Region Field */}
           <form.Field
             name="region"
             validators={{ onChange: createGameProfileSchema.shape.region }}

@@ -5,9 +5,11 @@ import {
   gameProfile as gameProfileTable,
   insertGameProfileSchema,
 } from "../db/schema/gameProfile"
-import { eq } from "drizzle-orm"
+import { eq, desc } from "drizzle-orm"
 import { createGameProfileSchema } from "../sharedTypes"
 import { zValidator } from "@hono/zod-validator"
+import { defaultResources } from "../lib/resources"
+import { resource } from "../db/schema/resource"
 
 export const gameProfilesRoute = new Hono()
   .get("/", getUser, async (c) => {
@@ -17,6 +19,7 @@ export const gameProfilesRoute = new Hono()
       .select()
       .from(gameProfileTable)
       .where(eq(gameProfileTable.userId, user.id))
+      .orderBy(desc(gameProfileTable.createdAt))
 
     return c.json({ gameProfiles: gameProfiles })
   })
@@ -32,12 +35,41 @@ export const gameProfilesRoute = new Hono()
         ...gameProfile,
         userId: user.id,
       })
+      const result = await db.transaction(async (tx) => {
+        try {
+          const gameProfile = await tx
+            .insert(gameProfileTable)
+            .values(validatedGameProfile)
+            .returning()
+            .then((res) => res[0])
 
-      const result = await db
-        .insert(gameProfileTable)
-        .values(validatedGameProfile)
-        .returning()
-        .then((res) => res[0])
-      return c.json(result)
+          if (!gameProfile) {
+            throw new Error("Failed to create game profile")
+          }
+
+          const resources = defaultResources[gameProfile.game].map(
+            (resource) => ({
+              gameProfileId: gameProfile.id,
+              resourceName: resource.name,
+              resourceType: resource.type,
+              maxAmount: resource.maxAmount || null,
+              currentAmount: 0,
+            })
+          )
+
+          await tx.insert(resource).values(resources)
+
+          return gameProfile
+        } catch (err) {
+          console.log(err)
+          await tx.rollback()
+        }
+      })
+
+      if (result) {
+        return c.json(result)
+      } else {
+        throw new Error("Failed to create game profile")
+      }
     }
   )
