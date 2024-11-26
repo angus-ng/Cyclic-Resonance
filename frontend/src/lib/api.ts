@@ -1,7 +1,7 @@
 import { hc } from "hono/client"
 import { type ApiRoutes } from "@server/app"
 import { queryOptions } from "@tanstack/react-query"
-import { type CreateExpense } from "@server/sharedTypes"
+import { CreateGameProfile, type CreateExpense } from "@server/sharedTypes"
 
 const client = hc<ApiRoutes>("/")
 export const api = client.api
@@ -63,4 +63,32 @@ export async function deleteExpense({ id }: { id: number }) {
   if (!res.ok) {
     throw new Error("server error")
   }
+}
+
+export async function getAllGameProfiles() {
+  const res = await api["game-profiles"].$get()
+  if (!res.ok) {
+    throw new Error("server error")
+  }
+  const data = await res.json()
+  return data
+}
+
+export const getAllGameProfilesOptions = queryOptions({
+  queryKey: ["get-game-profiles"],
+  queryFn: getAllGameProfiles,
+  staleTime: 1000 * 60 * 5,
+})
+
+export async function createGameProfile({
+  value,
+}: {
+  value: CreateGameProfile
+}) {
+  const res = await api["game-profiles"].$post({ json: value })
+  if (!res.ok) {
+    throw new Error("Server error")
+  }
+  const newExpense = await res.json()
+  return newExpense
 }

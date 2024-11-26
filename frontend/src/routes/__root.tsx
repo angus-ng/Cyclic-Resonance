@@ -68,7 +68,7 @@ function Root() {
   return (
     <>
       <NavBar />
-      <div className="p-2 gap-2 max-w-2xl m-auto">
+      <div className="pl-48 p-2 gap-2 max-w-full m-auto">
         <Outlet />
       </div>
       <Toaster />
