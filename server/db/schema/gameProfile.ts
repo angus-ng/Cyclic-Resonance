@@ -35,6 +35,8 @@ export const gameProfile = pgTable(
   (game_profile) => [index("user_gameProfile_idx").on(game_profile.userId)]
 )
 
+export type GameProfile = typeof gameProfile.$inferSelect
+
 export const insertGameProfileSchema = createInsertSchema(gameProfile, {
   game: z.enum(games),
   ign: z.string().min(1, { message: "IGN cannot be empty" }),
