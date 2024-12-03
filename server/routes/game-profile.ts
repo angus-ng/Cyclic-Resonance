@@ -73,3 +73,33 @@ export const gameProfilesRoute = new Hono()
       }
     }
   )
+  .put(
+    "/:id{[0-9]+}",
+    getUser,
+    zValidator("json", createGameProfileSchema),
+    async (c) => {
+      const gameProfile = await c.req.valid("json")
+      const user = c.var.user
+      const profileId = parseInt(c.req.param("id"))
+      const validatedGameProfile = insertGameProfileSchema.parse({
+        ...gameProfile,
+        userId: user.id,
+      })
+      try {
+        const result = await db
+          .update(gameProfileTable)
+          .set(validatedGameProfile)
+          .where(eq(gameProfileTable.id, profileId))
+          .returning()
+          .then((res) => res[0])
+
+        if (!result) {
+          throw new Error("Failed to update game profile")
+        }
+        return c.json(result)
+      } catch (err) {
+        console.log(err)
+        throw new Error("Failed to update game profile")
+      }
+    }
+  )

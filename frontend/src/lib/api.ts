@@ -65,6 +65,25 @@ export async function deleteExpense({ id }: { id: number }) {
   }
 }
 
+export async function updateGameProfile({
+  id,
+  updatedGameProfile,
+}: {
+  id: number
+  updatedGameProfile: CreateGameProfile
+}) {
+  const res = await api["game-profiles"][":id{[0-9]+}"].$put({
+    param: { id: id.toString() },
+    json: updatedGameProfile,
+  })
+
+  if (!res.ok) {
+    throw new Error("Server error during update")
+  }
+
+  return res.json()
+}
+
 export async function getAllGameProfiles() {
   const res = await api["game-profiles"].$get()
   if (!res.ok) {

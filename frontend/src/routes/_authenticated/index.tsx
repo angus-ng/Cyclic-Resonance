@@ -8,8 +8,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-import { getAllGameProfilesOptions } from "@/lib/api"
-import { useQuery } from "@tanstack/react-query"
+import { getAllGameProfilesOptions, updateGameProfile } from "@/lib/api"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import ProfileModal from "@/components/ui/profileModal"
 import { useState } from "react"
@@ -27,6 +27,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { Label } from "@/components/ui/label"
 import { createGameProfileSchema } from "@server/sharedTypes"
 import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
 
 export const Route = createFileRoute("/_authenticated/")({
   component: Index,
@@ -61,7 +62,7 @@ function Index() {
   return (
     <>
       <div className="min-h-full bg-background text-text p-6 flex flex-col">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 gap-x-6">
           <h1 className="text-3xl font-bold">Gacha Dashboard</h1>
           <Button
             className="bg-primary text-background hover:bg-accent"
@@ -72,22 +73,25 @@ function Index() {
         </div>
 
         {!isLoading ? (
-          <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+          <div className="flex flex-wrap gap-4 justify-start">
             {data && data.gameProfiles.length > 0 ? (
               data.gameProfiles.map((profile) =>
                 editModeProfileId === profile.id ? (
                   <ProfileEditForm
                     key={profile.id}
-                    profile={profile}
+                    profile={{
+                      ...profile,
+                      createdAt: new Date(profile.createdAt),
+                    }}
                     setEditModeProfileId={setEditModeProfileId}
                   />
                 ) : (
                   <Card
                     key={profile.id}
-                    className="flex flex-col w-72 p-4 bg-background border border-secondary rounded-lg hover:ring-2 hover:ring-accent transition-all duration-200"
+                    className="flex flex-col w-72 p-4 bg-background border border-secondary rounded-lg hover:ring-2 hover:ring-accent transition-all duration-200 max-h-72 overflow-auto"
                   >
                     <UserRoundPen
-                      className="flex flex-row self-end"
+                      className="flex flex-row self-end min-h-4 min-w-4"
                       onClick={() => handleEditClick(profile.id)}
                     />
                     <CardHeader className="flex flex-row justify-center items-center text-center w-full">
@@ -137,6 +141,29 @@ const ProfileEditForm = ({
     setEditModeProfileId(null)
   }
   const queryClient = useQueryClient()
+  const updateMutation = useMutation({
+    mutationFn: updateGameProfile,
+    onError: () => {
+      toast("Error", {
+        description: `Failed to update game profile: ${profile.id}`,
+      })
+    },
+    onSuccess: (updatedProfile) => {
+      toast("Game Profile Updated", {
+        description: `Successfully updated game profile : ${profile.id}`,
+      })
+      queryClient.setQueryData(["get-game-profiles"], (oldData: any) => {
+        if (!Array.isArray(oldData)) {
+          console.error("Old data is not an array:", oldData)
+          return [] // Return an empty array to avoid further issues
+        }
+
+        return oldData.map((gameProfile) =>
+          gameProfile.id === updatedProfile.id ? updatedProfile : gameProfile
+        )
+      })
+    },
+  })
   const form = useForm({
     validatorAdapter: zodValidator(),
     defaultValues: {
@@ -146,8 +173,15 @@ const ProfileEditForm = ({
       region: profile.region as RegionName,
     },
     onSubmit: async ({ value }) => {
-      console.log("GG")
-      setEditModeProfileId(null)
+      try {
+        await updateMutation.mutateAsync({
+          id: profile.id,
+          updatedGameProfile: value,
+        })
+        setEditModeProfileId(null)
+      } catch (error) {
+        console.error("Error updating profile", error)
+      }
     },
   })
   return (
@@ -290,7 +324,7 @@ const ProfileEditForm = ({
         </CardContent>
         <CardFooter className="mt-4 text-sm text-secondary text-center flex justify-center items-center">
           <div className="flex flex-col">
-            Created At: {new Date(profile.createdAt).toLocaleDateString()}
+            Created At: {profile.createdAt.toLocaleDateString()}
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
             >
