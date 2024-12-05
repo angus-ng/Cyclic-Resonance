@@ -1,17 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
 import { getAllGameProfilesOptions, updateGameProfile } from "@/lib/api"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
-import ProfileModal from "@/components/ui/profileModal"
+import CreateProfileSideMenu from "@/components/ui/CreateProfileSideMenu"
 import { useState } from "react"
 import { SquareX, UserRoundPen } from "lucide-react"
 import { useForm } from "@tanstack/react-form"
@@ -33,23 +26,14 @@ export const Route = createFileRoute("/_authenticated/")({
   component: Index,
 })
 
-// async function getGameProfiles() {
-//   const res = await api["game-profiles"].$get()
-//   if (!res.ok) {
-//     throw new Error("server error")
-//   }
-//   const data = await res.json()
-//   return data
-// }
-
 function Index() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [editModeProfileId, setEditModeProfileId] = useState<number | null>(
     null
   )
 
-  const openModal = () => setIsModalOpen(true)
-  const closeModal = () => setIsModalOpen(false)
+  const openSideMenu = () => setIsMenuOpen(true)
+  const closeSideMenu = () => setIsMenuOpen(false)
   const handleEditClick = (profileId: number | null) => {
     setEditModeProfileId((prevProfileId) =>
       prevProfileId === profileId ? null : profileId
@@ -66,7 +50,7 @@ function Index() {
           <h1 className="text-3xl font-bold">Gacha Dashboard</h1>
           <Button
             className="bg-primary text-background hover:bg-accent"
-            onClick={openModal}
+            onClick={openSideMenu}
           >
             Create New Profile
           </Button>
@@ -124,7 +108,7 @@ function Index() {
         ) : (
           <div>Loading...</div>
         )}
-        <ProfileModal isOpen={isModalOpen} closeModal={closeModal} />
+        <CreateProfileSideMenu isOpen={isMenuOpen} closeMenu={closeSideMenu} />
       </div>
     </>
   )
@@ -152,16 +136,22 @@ const ProfileEditForm = ({
       toast("Game Profile Updated", {
         description: `Successfully updated game profile : ${profile.id}`,
       })
-      queryClient.setQueryData(["get-game-profiles"], (oldData: any) => {
-        if (!Array.isArray(oldData)) {
-          console.error("Old data is not an array:", oldData)
-          return [] // Return an empty array to avoid further issues
-        }
+      queryClient.setQueryData(
+        ["get-game-profiles"],
+        (data: { gameProfiles: GameProfile[] }) => {
+          if (!Array.isArray(data.gameProfiles)) {
+            return []
+          }
 
-        return oldData.map((gameProfile) =>
-          gameProfile.id === updatedProfile.id ? updatedProfile : gameProfile
-        )
-      })
+          return {
+            gameProfiles: data.gameProfiles.map((gameProfile) =>
+              gameProfile.id === updatedProfile.id
+                ? updatedProfile
+                : gameProfile
+            ),
+          }
+        }
+      )
     },
   })
   const form = useForm({
