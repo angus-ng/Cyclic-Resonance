@@ -119,3 +119,13 @@ export async function createGameProfile({
   const newExpense = await res.json()
   return newExpense
 }
+
+export async function deleteGameProfile({ id }: { id: number }) {
+  const res = await api["game-profiles"][":id{[0-9]+}"].$delete({
+    param: { id: id.toString() },
+  })
+
+  if (!res.ok) {
+    throw new Error("server error")
+  }
+}
