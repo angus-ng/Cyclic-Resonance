@@ -2,7 +2,7 @@ import { deleteGameProfile, updateGameProfile } from "@/lib/api"
 import {
   GameName,
   GameProfile,
-  games,
+  Games,
   RegionName,
   regions,
 } from "@server/db/schema/gameProfile"
@@ -141,7 +141,7 @@ const ProfileEditForm = ({
                   }
                   className="block w-full p-2 border border-gray-300 rounded-md bg-background text-text"
                 >
-                  {games.map((game) => {
+                  {Games.map((game) => {
                     return (
                       <option key={game} value={game}>
                         {game}

@@ -9,10 +9,11 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import {
   GameName,
-  games,
+  Games,
   RegionName,
   regions,
 } from "@server/db/schema/gameProfile"
+import { SquareX } from "lucide-react"
 
 function CreateProfileSideMenu({
   isOpen,
@@ -73,8 +74,8 @@ function CreateProfileSideMenu({
       }`}
       onClick={(e) => e.stopPropagation()}
     >
-      <button onClick={closeMenu} className="absolute top-4 right-4 text-white">
-        X
+      <button onClick={closeMenu} className="absolute top-4 right-4">
+        <SquareX className="flex flex-row self-end" />
       </button>
       <h2 className="text-xl font-bold mb-4">Create Game Profile</h2>
       <form
@@ -99,7 +100,7 @@ function CreateProfileSideMenu({
                 onChange={(e) => field.handleChange(e.target.value as GameName)}
                 className="block w-full p-2 border border-gray-300 rounded-md bg-background text-text"
               >
-                {games.map((game) => {
+                {Games.map((game) => {
                   return (
                     <option key={game} value={game}>
                       {game}

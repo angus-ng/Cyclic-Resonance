@@ -129,3 +129,21 @@ export async function deleteGameProfile({ id }: { id: number }) {
     throw new Error("server error")
   }
 }
+
+export async function getProfileResources({ id }: { id: number }) {
+  const res = await api["game-profiles"][":id{[0-9]+}"].$get({
+    param: { id: id.toString() },
+  })
+  if (!res.ok) {
+    throw new Error("server error")
+  }
+  const data = await res.json()
+  return data
+}
+
+export const getProfileResourcesOptions = (profileId: number) =>
+  queryOptions({
+    queryKey: ["get-profile-resources", profileId],
+    queryFn: () => getProfileResources({ id: profileId }),
+    staleTime: 1000 * 60 * 5,
+  })

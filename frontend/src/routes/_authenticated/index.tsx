@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
 import { getAllGameProfilesOptions } from "@/lib/api"
@@ -57,31 +57,38 @@ function Index() {
                     setEditModeProfileId={setEditModeProfileId}
                   />
                 ) : (
-                  <Card
-                    key={profile.id}
-                    className="flex flex-col w-72 p-4 bg-background border border-secondary rounded-lg hover:ring-2 hover:ring-accent transition-all duration-200 max-h-72 overflow-auto"
-                  >
-                    <UserRoundPen
-                      className="flex flex-row self-end min-h-4 min-w-4"
-                      onClick={() => handleEditClick(profile.id)}
-                    />
-                    <CardHeader className="flex flex-row justify-center items-center text-center w-full">
-                      <h2 className="text-xl font-bold text-text">
-                        {profile.game}
-                      </h2>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center">
-                      <p className="text-secondary">IGN: {profile.ign}</p>
-                      <p className="text-secondary">
-                        Game UID: {profile.gameUID}
-                      </p>
-                      <p className="text-secondary">Region: {profile.region}</p>
-                    </CardContent>
-                    <CardFooter className="mt-4 text-sm text-secondary text-center flex justify-center items-center">
-                      Created At:{" "}
-                      {new Date(profile.createdAt).toLocaleDateString()}
-                    </CardFooter>
-                  </Card>
+                  <Link href={`/game-profile/${profile.id}`}>
+                    <Card
+                      key={profile.id}
+                      className="flex flex-col w-72 p-4 bg-background border border-secondary rounded-lg hover:ring-2 hover:ring-accent transition-all duration-200 max-h-72 overflow-auto"
+                    >
+                      <UserRoundPen
+                        className="flex flex-row self-end min-h-4 min-w-4"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          handleEditClick(profile.id)
+                        }}
+                      />
+                      <CardHeader className="flex flex-row justify-center items-center text-center w-full">
+                        <h2 className="text-xl font-bold text-text">
+                          {profile.game}
+                        </h2>
+                      </CardHeader>
+                      <CardContent className="flex flex-col items-center">
+                        <p className="text-secondary">IGN: {profile.ign}</p>
+                        <p className="text-secondary">
+                          Game UID: {profile.gameUID}
+                        </p>
+                        <p className="text-secondary">
+                          Region: {profile.region}
+                        </p>
+                      </CardContent>
+                      <CardFooter className="mt-4 text-sm text-secondary text-center flex justify-center items-center">
+                        Created At:{" "}
+                        {new Date(profile.createdAt).toLocaleDateString()}
+                      </CardFooter>
+                    </Card>
+                  </Link>
                 )
               )
             ) : (

@@ -24,29 +24,20 @@ function NavBar() {
           </h1>
         </Link>
         <Link
+          to="/"
+          className="relative [&.active]:font-semibold [&.active]:text-accent  text-text hover:text-accent group"
+        >
+          <span className="group-hover:translate-x-2 transition-transform duration-300">
+            Home
+          </span>
+          <div className="absolute left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-300"></div>
+        </Link>
+        <Link
           to="/about"
           className="relative [&.active]:font-semibold [&.active]:text-accent  text-text hover:text-accent group"
         >
           <span className="group-hover:translate-x-2 transition-transform duration-300">
             About
-          </span>
-          <div className="absolute left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-300"></div>
-        </Link>
-        <Link
-          to="/expenses"
-          className="relative [&.active]:font-semibold [&.active]:text-accent text-text hover:text-accent group"
-        >
-          <span className="group-hover:translate-x-2 transition-transform duration-300">
-            Expenses
-          </span>
-          <div className="absolute left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-300"></div>
-        </Link>
-        <Link
-          to="/create-expense"
-          className="relative [&.active]:font-semibold [&.active]:text-accent text-text hover:text-accent group"
-        >
-          <span className="group-hover:translate-x-2 transition-transform duration-300">
-            Create Expense
           </span>
           <div className="absolute left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-300"></div>
         </Link>
