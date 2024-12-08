@@ -9,11 +9,8 @@ import {
 } from "drizzle-orm/pg-core"
 import { gameProfile } from "./gameProfile"
 
-export const resourceTypeEnum = pgEnum("resource_type", [
-  "Currency",
-  "Stamina",
-  "Progression",
-])
+export const ResourceType = ["Currency", "Stamina", "Progression"] as const
+export const resourceTypeEnum = pgEnum("resource_type", ResourceType)
 
 export const resource = pgTable(
   "resource",
@@ -26,7 +23,7 @@ export const resource = pgTable(
     resourceType: resourceTypeEnum().notNull(),
     currentAmount: integer("current_amount").notNull().default(0),
     maxAmount: integer("max_amount"),
-    lastUpdated: timestamp("last_updated").defaultNow(),
+    lastUpdated: timestamp("last_updated").notNull().defaultNow(),
   },
   (resources) => [
     index("game_profile_idx").on(resources.gameProfileId),

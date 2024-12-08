@@ -60,7 +60,7 @@ function Index() {
                   <Link href={`/game-profile/${profile.id}`}>
                     <Card
                       key={profile.id}
-                      className="flex flex-col w-72 p-4 bg-background border border-secondary rounded-lg hover:ring-2 hover:ring-accent transition-all duration-200 max-h-72 overflow-auto"
+                      className="flex flex-col w-72 p-4 bg-background border border-secondary rounded-lg hover:ring-2 hover:ring-accent transition-all duration-200 max-h-72 overflow-auto transform hover:scale-105 hover:shadow-2xl"
                     >
                       <UserRoundPen
                         className="flex flex-row self-end min-h-4 min-w-4"

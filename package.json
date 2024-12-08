@@ -1,5 +1,5 @@
 {
-  "name": "frameworks-stack",
+  "name": "cyclic-resonance",
   "module": "server/index.ts",
   "type": "module",
   "scripts": {

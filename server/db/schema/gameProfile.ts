@@ -13,13 +13,13 @@ export const regions = ["America", "Europe", "Asia", "TW, HK, MO"] as const
 export const regionEnum = pgEnum("region", regions)
 export type RegionName = (typeof regions)[number]
 
-export const games = [
+export const Games = [
   "Genshin Impact",
   "Honkai Star Rail",
   "Zenless Zone Zero",
 ] as const
-export const gameEnum = pgEnum("game", games)
-export type GameName = (typeof games)[number]
+export const gameEnum = pgEnum("game", Games)
+export type GameName = (typeof Games)[number]
 
 export const gameProfile = pgTable(
   "game_profile",
@@ -38,7 +38,7 @@ export const gameProfile = pgTable(
 export type GameProfile = typeof gameProfile.$inferSelect
 
 export const insertGameProfileSchema = createInsertSchema(gameProfile, {
-  game: z.enum(games),
+  game: z.enum(Games),
   ign: z.string().min(1, { message: "IGN cannot be empty" }),
   gameUID: z
     .string()

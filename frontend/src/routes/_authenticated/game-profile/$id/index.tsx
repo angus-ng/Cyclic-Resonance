@@ -1,3 +1,4 @@
+import ResourcesSkeleton from "@/components/skeletons/ResourcesSkeleton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
@@ -29,6 +30,20 @@ function RouteComponent() {
   const filteredResources = selectedResourceType
     ? data?.filter((resource) => resource.resourceType === selectedResourceType)
     : data
+
+  const getResourceBadgeClass = (resourceType: string) => {
+    switch (resourceType) {
+      case "Currency":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300 "
+      case "Stamina":
+        return "bg-green-100 text-green-800 border-green-300"
+      case "Progression":
+        return "bg-blue-100 text-blue-800 border-blue-300"
+      default:
+        return ""
+    }
+  }
+
   return (
     <>
       <div className="min-h-full bg-background text-text p-6 flex flex-col">
@@ -68,70 +83,77 @@ function RouteComponent() {
             Add Resource
           </Button>
         </div>
-        <div className="flex flex-wrap gap-4 justify-start">
-          {filteredResources?.map((resource) => (
-            <Card
-              key={resource.id}
-              className="w-full max-w-sm bg-background rounded-lg shadow-lg flex flex-col justify-center hover:ring-2 hover:ring-accent transition-all duration-200"
-            >
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-text">
-                    {resource.resourceName}
-                  </h2>
-                  <Badge className="text-sm" variant="outline">
-                    {resource.resourceType}
-                  </Badge>
-                </div>
-              </CardHeader>
-
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="text-sm text-gray-400">
-                    <span>Current Amount:</span>{" "}
-                    <span
-                      className={
-                        resource.currentAmount === 0
-                          ? "text-red-500"
-                          : "text-green-500"
-                      }
+        {!isLoading ? (
+          <div className="flex flex-wrap gap-4 justify-start">
+            {filteredResources?.map((resource) => (
+              <Card
+                key={resource.id}
+                className="w-full max-w-sm bg-background rounded-lg shadow-lg flex flex-col justify-start hover:ring-2 hover:ring-accent transition-all duration-200 transform hover:scale-105 hover:shadow-2xl"
+              >
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold text-text">
+                      {resource.resourceName}
+                    </h2>
+                    <Badge
+                      className={`text-sm ${getResourceBadgeClass(resource.resourceType)}`}
+                      variant="outline"
                     >
-                      {resource.currentAmount}
-                    </span>
+                      {resource.resourceType}
+                    </Badge>
                   </div>
-                  {resource.maxAmount && (
-                    <div className="text-sm text-gray-400">
-                      <span>Max Amount:</span> {resource.maxAmount}
-                    </div>
-                  )}
-                  {resource.maxAmount && (
-                    <div className="w-full bg-background-lighter rounded-full h-2 mt-2">
-                      <div
-                        className="bg-primary h-2 rounded-full"
-                        style={{
-                          width: `${(resource.currentAmount / resource.maxAmount) * 100}%`,
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className="text-xs text-gray-500">
-                    Last updated:{" "}
-                    {formatDistanceToNow(new Date(resource.lastUpdated))} ago
-                  </div>
-                </div>
-              </CardContent>
+                </CardHeader>
 
-              <CardFooter>
-                <Button
-                  variant="outline"
-                  className="w-full text-sm bg-primary text-background hover:bg-accent hover:text-background-lighter transition-all duration-200"
-                >
-                  Manage
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="text-sm text-gray-400">
+                      <span>Current Amount:</span>{" "}
+                      <span
+                        className={
+                          resource.currentAmount === 0
+                            ? "text-red-500"
+                            : "text-green-500"
+                        }
+                      >
+                        {resource.currentAmount}
+                      </span>
+                    </div>
+                    {resource.maxAmount && (
+                      <div className="text-sm text-gray-400">
+                        <span>Max Amount:</span> {resource.maxAmount}
+                      </div>
+                    )}
+                    {resource.maxAmount && (
+                      <div className="w-full bg-background-lighter rounded-full h-2 mt-2">
+                        <div
+                          className="bg-primary h-2 rounded-full"
+                          style={{
+                            width: `${(resource.currentAmount / resource.maxAmount) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div className="text-xs text-gray-500">
+                      Last updated:{" "}
+                      {formatDistanceToNow(new Date(resource.lastUpdated))} ago
+                    </div>
+                  </div>
+                </CardContent>
+
+                <CardFooter>
+                  <Button
+                    variant="outline"
+                    className="w-full text-sm bg-primary text-background hover:bg-accent hover:text-background-lighter transition-all duration-200"
+                  >
+                    Manage
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <ResourcesSkeleton count={6} />
+        )}
       </div>
     </>
   )
