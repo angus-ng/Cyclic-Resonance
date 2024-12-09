@@ -15,8 +15,6 @@ import { Route as AboutImport } from './routes/about'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedProfileImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedExpensesImport } from './routes/_authenticated/expenses'
-import { Route as AuthenticatedCreateExpenseImport } from './routes/_authenticated/create-expense'
 import { Route as AuthenticatedGameProfileIdIndexImport } from './routes/_authenticated/game-profile/$id/index'
 import { Route as AuthenticatedGameProfileIdScreenshotsImport } from './routes/_authenticated/game-profile/$id/screenshots'
 
@@ -44,20 +42,6 @@ const AuthenticatedProfileRoute = AuthenticatedProfileImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-
-const AuthenticatedExpensesRoute = AuthenticatedExpensesImport.update({
-  id: '/expenses',
-  path: '/expenses',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-
-const AuthenticatedCreateExpenseRoute = AuthenticatedCreateExpenseImport.update(
-  {
-    id: '/create-expense',
-    path: '/create-expense',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any,
-)
 
 const AuthenticatedGameProfileIdIndexRoute =
   AuthenticatedGameProfileIdIndexImport.update({
@@ -90,20 +74,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/about'
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
-    }
-    '/_authenticated/create-expense': {
-      id: '/_authenticated/create-expense'
-      path: '/create-expense'
-      fullPath: '/create-expense'
-      preLoaderRoute: typeof AuthenticatedCreateExpenseImport
-      parentRoute: typeof AuthenticatedImport
-    }
-    '/_authenticated/expenses': {
-      id: '/_authenticated/expenses'
-      path: '/expenses'
-      fullPath: '/expenses'
-      preLoaderRoute: typeof AuthenticatedExpensesImport
-      parentRoute: typeof AuthenticatedImport
     }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
@@ -139,8 +109,6 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedCreateExpenseRoute: typeof AuthenticatedCreateExpenseRoute
-  AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedGameProfileIdScreenshotsRoute: typeof AuthenticatedGameProfileIdScreenshotsRoute
@@ -148,8 +116,6 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedCreateExpenseRoute: AuthenticatedCreateExpenseRoute,
-  AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedGameProfileIdScreenshotsRoute:
@@ -164,8 +130,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
-  '/create-expense': typeof AuthenticatedCreateExpenseRoute
-  '/expenses': typeof AuthenticatedExpensesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/': typeof AuthenticatedIndexRoute
   '/game-profile/$id/screenshots': typeof AuthenticatedGameProfileIdScreenshotsRoute
@@ -174,8 +138,6 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/about': typeof AboutRoute
-  '/create-expense': typeof AuthenticatedCreateExpenseRoute
-  '/expenses': typeof AuthenticatedExpensesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/': typeof AuthenticatedIndexRoute
   '/game-profile/$id/screenshots': typeof AuthenticatedGameProfileIdScreenshotsRoute
@@ -186,8 +148,6 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
-  '/_authenticated/create-expense': typeof AuthenticatedCreateExpenseRoute
-  '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/game-profile/$id/screenshots': typeof AuthenticatedGameProfileIdScreenshotsRoute
@@ -199,8 +159,6 @@ export interface FileRouteTypes {
   fullPaths:
     | ''
     | '/about'
-    | '/create-expense'
-    | '/expenses'
     | '/profile'
     | '/'
     | '/game-profile/$id/screenshots'
@@ -208,8 +166,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/about'
-    | '/create-expense'
-    | '/expenses'
     | '/profile'
     | '/'
     | '/game-profile/$id/screenshots'
@@ -218,8 +174,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/about'
-    | '/_authenticated/create-expense'
-    | '/_authenticated/expenses'
     | '/_authenticated/profile'
     | '/_authenticated/'
     | '/_authenticated/game-profile/$id/screenshots'
@@ -254,8 +208,6 @@ export const routeTree = rootRoute
     "/_authenticated": {
       "filePath": "_authenticated.tsx",
       "children": [
-        "/_authenticated/create-expense",
-        "/_authenticated/expenses",
         "/_authenticated/profile",
         "/_authenticated/",
         "/_authenticated/game-profile/$id/screenshots",
@@ -264,14 +216,6 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.tsx"
-    },
-    "/_authenticated/create-expense": {
-      "filePath": "_authenticated/create-expense.tsx",
-      "parent": "/_authenticated"
-    },
-    "/_authenticated/expenses": {
-      "filePath": "_authenticated/expenses.tsx",
-      "parent": "/_authenticated"
     },
     "/_authenticated/profile": {
       "filePath": "_authenticated/profile.tsx",

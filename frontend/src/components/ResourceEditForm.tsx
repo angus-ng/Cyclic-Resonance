@@ -35,6 +35,12 @@ const ResourceEditForm = ({
       toast("Resource Deleted", {
         description: `Successfully deleted resource: ${resource.id}`,
       })
+      queryClient.setQueryData(
+        ["get-profile-resources", resource.gameProfileId],
+        (data: Resource[]) => {
+          return data.filter((r) => resource.id !== r.id)
+        }
+      )
       setEditModeResourceId(null)
     },
   })
@@ -67,9 +73,13 @@ const ResourceEditForm = ({
     },
   })
 
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
+  const handleDelete = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    id: number,
+    resourceId: number
+  ) => {
     e.preventDefault()
-    // deleteMutation.mutate({ id })
+    deleteMutation.mutate({ id, resourceId })
   }
 
   const form = useForm({
@@ -245,7 +255,9 @@ const ResourceEditForm = ({
                   {isSubmitting ? "Updating..." : "Update"}
                 </Button>
                 <button
-                  onClick={(e) => handleDelete(e, resource.id)}
+                  onClick={(e) =>
+                    handleDelete(e, resource.gameProfileId, resource.id)
+                  }
                   className="text-accent font-semibold text-sm"
                 >
                   Delete

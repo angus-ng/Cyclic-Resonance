@@ -46,51 +46,53 @@ function Index() {
         {!isLoading ? (
           <div className="flex flex-wrap gap-4 justify-start">
             {data && data.gameProfiles.length > 0 ? (
-              data.gameProfiles.map((profile) =>
-                editModeProfileId === profile.id ? (
-                  <ProfileEditForm
-                    key={profile.id}
-                    profile={{
-                      ...profile,
-                      createdAt: new Date(profile.createdAt),
-                    }}
-                    setEditModeProfileId={setEditModeProfileId}
-                  />
-                ) : (
-                  <Link href={`/game-profile/${profile.id}`}>
-                    <Card
-                      key={profile.id}
-                      className="flex flex-col w-72 p-4 bg-background border border-secondary rounded-lg hover:ring-2 hover:ring-accent transition-all duration-200 max-h-72 overflow-auto transform hover:scale-105 hover:shadow-2xl"
-                    >
-                      <UserRoundPen
-                        className="flex flex-row self-end min-h-4 min-w-4"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handleEditClick(profile.id)
+              data.gameProfiles.map((profile) => {
+                const isEditing = editModeProfileId === profile.id
+
+                return (
+                  <div key={profile.id} className="w-full md:w-72">
+                    {isEditing ? (
+                      <ProfileEditForm
+                        profile={{
+                          ...profile,
+                          createdAt: new Date(profile.createdAt),
                         }}
+                        setEditModeProfileId={setEditModeProfileId}
                       />
-                      <CardHeader className="flex flex-row justify-center items-center text-center w-full">
-                        <h2 className="text-xl font-bold text-text">
-                          {profile.game}
-                        </h2>
-                      </CardHeader>
-                      <CardContent className="flex flex-col items-center">
-                        <p className="text-secondary">IGN: {profile.ign}</p>
-                        <p className="text-secondary">
-                          Game UID: {profile.gameUID}
-                        </p>
-                        <p className="text-secondary">
-                          Region: {profile.region}
-                        </p>
-                      </CardContent>
-                      <CardFooter className="mt-4 text-sm text-secondary text-center flex justify-center items-center">
-                        Created At:{" "}
-                        {new Date(profile.createdAt).toLocaleDateString()}
-                      </CardFooter>
-                    </Card>
-                  </Link>
+                    ) : (
+                      <Link href={`/game-profile/${profile.id}`}>
+                        <Card className="flex flex-col p-4 bg-background border border-secondary rounded-lg hover:ring-2 hover:ring-accent transition-all duration-200 max-h-72 overflow-auto transform hover:scale-105 hover:shadow-2xl">
+                          <UserRoundPen
+                            className="flex flex-row self-end min-h-4 min-w-4"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              handleEditClick(profile.id)
+                            }}
+                          />
+                          <CardHeader className="flex flex-row justify-center items-center text-center w-full">
+                            <h2 className="text-xl font-bold text-text">
+                              {profile.game}
+                            </h2>
+                          </CardHeader>
+                          <CardContent className="flex flex-col items-center">
+                            <p className="text-secondary">IGN: {profile.ign}</p>
+                            <p className="text-secondary">
+                              Game UID: {profile.gameUID}
+                            </p>
+                            <p className="text-secondary">
+                              Region: {profile.region}
+                            </p>
+                          </CardContent>
+                          <CardFooter className="mt-4 text-sm text-secondary text-center flex justify-center items-center">
+                            Created At:{" "}
+                            {new Date(profile.createdAt).toLocaleDateString()}
+                          </CardFooter>
+                        </Card>
+                      </Link>
+                    )}
+                  </div>
                 )
-              )
+              })
             ) : (
               <div className="flex justify-center items-center w-full h-64">
                 <p className="text-secondary">

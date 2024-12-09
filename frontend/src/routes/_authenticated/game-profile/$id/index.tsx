@@ -1,3 +1,4 @@
+import CreateResourceSideMenu from "@/components/CreateResourceSideMenu"
 import ResourceEditForm from "@/components/ResourceEditForm"
 import ResourcesSkeleton from "@/components/skeletons/ResourcesSkeleton"
 import { Badge } from "@/components/ui/badge"
@@ -8,7 +9,6 @@ import { ResourceType } from "@server/db/schema/resource"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { formatDistanceToNow } from "date-fns"
-import { ChevronLeft } from "lucide-react"
 import { useState } from "react"
 
 export const Route = createFileRoute("/_authenticated/game-profile/$id/")({
@@ -17,7 +17,8 @@ export const Route = createFileRoute("/_authenticated/game-profile/$id/")({
 
 function RouteComponent() {
   const { id } = Route.useParams()
-
+  const openSideMenu = () => setIsMenuOpen(true)
+  const closeSideMenu = () => setIsMenuOpen(false)
   const { isLoading, error, data } = useQuery(
     getProfileResourcesOptions(parseInt(id))
   )
@@ -27,6 +28,7 @@ function RouteComponent() {
   const [editModeResourceId, setEditModeResourceId] = useState<number | null>(
     null
   )
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value
@@ -62,7 +64,7 @@ function RouteComponent() {
 
   return (
     <>
-      <SubNav />
+      <SubNav id={id} />
       <div className="min-h-full bg-background text-text p-6 flex flex-col">
         <div className="flex justify-between items-center mb-6 gap-x-6">
           <div className="flex flex-col gap-2">
@@ -99,7 +101,7 @@ function RouteComponent() {
           </div>
           <Button
             className="bg-primary text-background hover:bg-accent"
-            // onClick={openSideMenu}
+            onClick={openSideMenu}
           >
             Add Resource
           </Button>
@@ -192,13 +194,17 @@ function RouteComponent() {
         ) : (
           <ResourcesSkeleton count={6} />
         )}
+        <CreateResourceSideMenu
+          isOpen={isMenuOpen}
+          closeMenu={closeSideMenu}
+          id={parseInt(id)}
+        />
       </div>
     </>
   )
 }
 
-function SubNav() {
-  const { id } = Route.useParams()
+export function SubNav({ id }: { id: string }) {
   return (
     <div className="w-full bg-background border-t border-t-primary mt-16">
       <nav className="flex justify-start gap-8 p-4 text-text">
