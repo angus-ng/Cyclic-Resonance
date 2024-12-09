@@ -1,7 +1,11 @@
 import { hc } from "hono/client"
 import { type ApiRoutes } from "@server/app"
 import { queryOptions } from "@tanstack/react-query"
-import { CreateGameProfile, type CreateExpense } from "@server/sharedTypes"
+import {
+  CreateGameProfile,
+  CreateResource,
+  type CreateExpense,
+} from "@server/sharedTypes"
 
 const client = hc<ApiRoutes>("/")
 export const api = client.api
@@ -147,3 +151,44 @@ export const getProfileResourcesOptions = (profileId: number) =>
     queryFn: () => getProfileResources({ id: profileId }),
     staleTime: 1000 * 60 * 5,
   })
+
+export async function deleteResource({
+  id,
+  resourceId,
+}: {
+  id: number
+  resourceId: number
+}) {
+  const res = await api["game-profiles"][":id{[0-9]+}"].resources[
+    ":resourceId{[0-9]+}"
+  ].$delete({
+    param: { id: id.toString(), resourceId: resourceId.toString() },
+  })
+
+  if (!res.ok) {
+    throw new Error("server error")
+  }
+}
+
+export async function updateResource({
+  id,
+  resourceId,
+  updatedResource,
+}: {
+  id: number
+  resourceId: number
+  updatedResource: CreateResource
+}) {
+  const res = await api["game-profiles"][":id{[0-9]+}"].resources[
+    ":resourceId{[0-9]+}"
+  ].$put({
+    param: { id: id.toString(), resourceId: resourceId.toString() },
+    json: updatedResource,
+  })
+
+  if (!res.ok) {
+    throw new Error("Server error during update")
+  }
+
+  return res.json()
+}

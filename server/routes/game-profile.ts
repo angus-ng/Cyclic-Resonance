@@ -6,10 +6,13 @@ import {
   insertGameProfileSchema,
 } from "../db/schema/gameProfile"
 import { eq, desc, and, exists } from "drizzle-orm"
-import { createGameProfileSchema } from "../sharedTypes"
+import { createGameProfileSchema, createResourceSchema } from "../sharedTypes"
 import { zValidator } from "@hono/zod-validator"
 import { defaultResources } from "../lib/resources"
-import { resource as resourceTable } from "../db/schema/resource"
+import {
+  insertResourceSchema,
+  resource as resourceTable,
+} from "../db/schema/resource"
 
 export const gameProfilesRoute = new Hono()
   .get("/", getUser, async (c) => {
@@ -139,16 +142,72 @@ export const gameProfilesRoute = new Hono()
   .delete("/:id{[0-9]+}", getUser, async (c) => {
     const id = Number.parseInt(c.req.param("id"))
     const user = c.var.user
-    const expense = await db
+    const gameProfile = await db
       .delete(gameProfileTable)
       .where(
         and(eq(gameProfileTable.userId, user.id), eq(gameProfileTable.id, id))
       )
       .returning()
       .then((res) => res[0])
-    if (!expense) {
+    if (!gameProfile) {
       return c.notFound()
     }
 
-    return c.json({ expense: expense })
+    return c.json({ gameProfile: gameProfile })
   })
+  .delete("/:id{[0-9]+}/resources/:resourceId{[0-9]+}", getUser, async (c) => {
+    const profileId = Number.parseInt(c.req.param("id"))
+    const user = c.var.user
+    const resourceId = Number.parseInt(c.req.param("resourceId"))
+  })
+  .put(
+    "/:id{[0-9]+}/resources/:resourceId{[0-9]+}",
+    getUser,
+    zValidator("json", createResourceSchema),
+    async (c) => {
+      const resource = await c.req.valid("json")
+      const user = c.var.user
+      const gameProfileId = parseInt(c.req.param("id"))
+      const resourceId = parseInt(c.req.param("resourceId"))
+      const validatedResource = insertResourceSchema.parse({
+        ...resource,
+        id: resourceId,
+        lastUpdated: new Date(Date.now()),
+      })
+      console.log(validatedResource)
+      try {
+        const ownership = await db
+          .select()
+          .from(gameProfileTable)
+          .where(
+            and(
+              eq(gameProfileTable.userId, user.id),
+              eq(gameProfileTable.id, resource.gameProfileId)
+            )
+          )
+        if (!ownership || !ownership.length) {
+          throw new Error("Failed to update resource")
+        }
+
+        const result = await db
+          .update(resourceTable)
+          .set(validatedResource)
+          .where(
+            and(
+              eq(resourceTable.id, resourceId),
+              eq(resourceTable.gameProfileId, gameProfileId)
+            )
+          )
+          .returning()
+          .then((res) => res[0])
+
+        if (!result) {
+          throw new Error("Failed to update resource")
+        }
+        return c.json(result)
+      } catch (err) {
+        console.log(err)
+        throw new Error("Failed to update resource")
+      }
+    }
+  )

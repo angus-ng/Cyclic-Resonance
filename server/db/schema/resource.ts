@@ -8,9 +8,12 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core"
 import { gameProfile } from "./gameProfile"
+import { createInsertSchema } from "drizzle-zod"
+import { z } from "zod"
 
 export const ResourceType = ["Currency", "Stamina", "Progression"] as const
 export const resourceTypeEnum = pgEnum("resource_type", ResourceType)
+export type ResourceTypeSelect = (typeof ResourceType)[number]
 
 export const resource = pgTable(
   "resource",
@@ -30,3 +33,25 @@ export const resource = pgTable(
     index("resource_name_idx").on(resources.resourceName),
   ]
 )
+
+export type Resource = typeof resource.$inferSelect
+
+export const insertResourceSchema = createInsertSchema(resource, {
+  gameProfileId: z.number(),
+  resourceName: z.string().min(1, { message: "Resource Name cannot be empty" }),
+  resourceType: z.enum(ResourceType),
+  currentAmount: z.number().min(0),
+  maxAmount: z
+    .union([z.string(), z.number()])
+    .transform((value) => {
+      if (value === "" || value === undefined) {
+        return null
+      }
+      return Number(value)
+    })
+    .refine(
+      (value) => value === null || (Number.isInteger(value) && value >= 0),
+      { message: "Max Amount must be a positive integer or null" }
+    )
+    .optional(),
+})
