@@ -6,9 +6,10 @@ import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import CreateProfileSideMenu from "@/components/CreateProfileSideMenu"
 import { useState } from "react"
-import { UserRoundPen } from "lucide-react"
+import { Copy, UserRoundPen } from "lucide-react"
 import ProfileEditForm from "@/components/ProfileEditForm"
 import GameProfileSkeleton from "@/components/skeletons/GameProfileSkeleton"
+import { toast } from "sonner"
 
 export const Route = createFileRoute("/_authenticated/")({
   component: Index,
@@ -26,6 +27,13 @@ function Index() {
     setEditModeProfileId((prevProfileId) =>
       prevProfileId === profileId ? null : profileId
     )
+  }
+
+  const handleUIDClick = (uid: string) => {
+    navigator.clipboard.writeText(uid)
+    toast("Copied to clipboard", {
+      description: `UID copied to clipboard: "${uid}"`,
+    })
   }
 
   const { isLoading, error, data } = useQuery(getAllGameProfilesOptions)
@@ -76,9 +84,18 @@ function Index() {
                           </CardHeader>
                           <CardContent className="flex flex-col items-center">
                             <p className="text-secondary">IGN: {profile.ign}</p>
-                            <p className="text-secondary">
-                              Game UID: {profile.gameUID}
-                            </p>
+                            <div
+                              className="flex justify-center items-center gap-2"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                handleUIDClick(profile.gameUID)
+                              }}
+                            >
+                              <p className="text-secondary">
+                                Game UID: {profile.gameUID}
+                              </p>
+                              <Copy size={16} />
+                            </div>
                             <p className="text-secondary">
                               Region: {profile.region}
                             </p>

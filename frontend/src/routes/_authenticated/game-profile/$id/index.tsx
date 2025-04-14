@@ -66,7 +66,7 @@ function RouteComponent() {
     <>
       <SubNav id={id} />
       <div className="min-h-full bg-background text-text p-6 flex flex-col">
-        <div className="flex justify-between items-center mb-6 gap-x-6">
+        <div className="flex justify-between mb-6 gap-x-6">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold">Resources</h1>
           </div>
@@ -121,7 +121,7 @@ function RouteComponent() {
               ) : (
                 <Card
                   key={resource.id}
-                  className="w-full min-w-sm max-w-sm bg-background rounded-lg shadow-lg flex flex-col justify-start hover:ring-2 hover:ring-accent transition-all duration-200 transform hover:scale-105 hover:shadow-2xl"
+                  className="w-full min-w-sm max-w-xs bg-background rounded-lg shadow-lg flex flex-col justify-start hover:ring-2 hover:ring-accent transition-all duration-200 transform hover:scale-105 hover:shadow-2xl"
                 >
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -206,7 +206,7 @@ function RouteComponent() {
 
 export function SubNav({ id }: { id: string }) {
   return (
-    <div className="w-full bg-background border-t border-t-primary mt-16">
+    <div className="w-full bg-background border-b border-b-primary">
       <nav className="flex justify-start gap-8 p-4 text-text">
         <Link
           to={`/game-profile/${id}`}
@@ -214,6 +214,15 @@ export function SubNav({ id }: { id: string }) {
         >
           <span className="group-hover:translate-x-2 transition-transform duration-300">
             Resources
+          </span>
+          <div className="absolute left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-300"></div>
+        </Link>
+        <Link
+          to={`/game-profile/${id}/codes`}
+          className="relative text-text hover:text-accent group [&.active]:text-accent"
+        >
+          <span className="group-hover:translate-x-2 transition-transform duration-300">
+            Redemption Codes
           </span>
           <div className="absolute left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-300"></div>
         </Link>

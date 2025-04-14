@@ -162,3 +162,58 @@ export async function createResource({
   const newResource = await res.json()
   return newResource
 }
+
+export async function getAllRedeemedCodes({ id }: { id: number }) {
+  const res = await api["game-profiles"][":id{[0-9]+}"].codes.$get({
+    param: { id: id.toString() },
+  })
+  if (!res.ok) {
+    throw new Error("server error")
+  }
+  const data = await res.json()
+  return data
+}
+
+export const getAllRedeemedCodesOptions = (profileId: number) =>
+  queryOptions({
+    queryKey: ["get-redeemedCodes", profileId],
+    queryFn: () => getAllRedeemedCodes({ id: profileId }),
+    staleTime: 1000 * 60 * 5,
+  })
+
+export async function createRedemptionCode({
+  id,
+  code,
+}: {
+  id: number
+  code: string
+}) {
+  const res = await api["game-profiles"][":id{[0-9]+}"].codes.$post({
+    param: { id: id.toString() },
+    json: { code },
+  })
+
+  if (!res.ok) {
+    throw new Error("Failed to add code")
+  }
+
+  return res.json()
+}
+
+export async function deleteRedemptionCode({
+  id,
+  codeId,
+}: {
+  id: number
+  codeId: number
+}) {
+  const res = await api["game-profiles"][":id{[0-9]+}"].codes[
+    ":codeId{[0-9]+}"
+  ].$delete({
+    param: { id: id.toString(), codeId: codeId.toString() },
+  })
+
+  if (!res.ok) {
+    throw new Error("Failed to delete code")
+  }
+}

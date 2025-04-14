@@ -17,6 +17,7 @@ import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index
 import { Route as AuthenticatedProfileImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedGameProfileIdIndexImport } from './routes/_authenticated/game-profile/$id/index'
 import { Route as AuthenticatedGameProfileIdScreenshotsImport } from './routes/_authenticated/game-profile/$id/screenshots'
+import { Route as AuthenticatedGameProfileIdCodesImport } from './routes/_authenticated/game-profile/$id/codes'
 
 // Create/Update Routes
 
@@ -57,6 +58,13 @@ const AuthenticatedGameProfileIdScreenshotsRoute =
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
+const AuthenticatedGameProfileIdCodesRoute =
+  AuthenticatedGameProfileIdCodesImport.update({
+    id: '/game-profile/$id/codes',
+    path: '/game-profile/$id/codes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -89,6 +97,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexImport
       parentRoute: typeof AuthenticatedImport
     }
+    '/_authenticated/game-profile/$id/codes': {
+      id: '/_authenticated/game-profile/$id/codes'
+      path: '/game-profile/$id/codes'
+      fullPath: '/game-profile/$id/codes'
+      preLoaderRoute: typeof AuthenticatedGameProfileIdCodesImport
+      parentRoute: typeof AuthenticatedImport
+    }
     '/_authenticated/game-profile/$id/screenshots': {
       id: '/_authenticated/game-profile/$id/screenshots'
       path: '/game-profile/$id/screenshots'
@@ -111,6 +126,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedGameProfileIdCodesRoute: typeof AuthenticatedGameProfileIdCodesRoute
   AuthenticatedGameProfileIdScreenshotsRoute: typeof AuthenticatedGameProfileIdScreenshotsRoute
   AuthenticatedGameProfileIdIndexRoute: typeof AuthenticatedGameProfileIdIndexRoute
 }
@@ -118,6 +134,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedGameProfileIdCodesRoute: AuthenticatedGameProfileIdCodesRoute,
   AuthenticatedGameProfileIdScreenshotsRoute:
     AuthenticatedGameProfileIdScreenshotsRoute,
   AuthenticatedGameProfileIdIndexRoute: AuthenticatedGameProfileIdIndexRoute,
@@ -132,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/': typeof AuthenticatedIndexRoute
+  '/game-profile/$id/codes': typeof AuthenticatedGameProfileIdCodesRoute
   '/game-profile/$id/screenshots': typeof AuthenticatedGameProfileIdScreenshotsRoute
   '/game-profile/$id': typeof AuthenticatedGameProfileIdIndexRoute
 }
@@ -140,6 +158,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/': typeof AuthenticatedIndexRoute
+  '/game-profile/$id/codes': typeof AuthenticatedGameProfileIdCodesRoute
   '/game-profile/$id/screenshots': typeof AuthenticatedGameProfileIdScreenshotsRoute
   '/game-profile/$id': typeof AuthenticatedGameProfileIdIndexRoute
 }
@@ -150,6 +169,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/game-profile/$id/codes': typeof AuthenticatedGameProfileIdCodesRoute
   '/_authenticated/game-profile/$id/screenshots': typeof AuthenticatedGameProfileIdScreenshotsRoute
   '/_authenticated/game-profile/$id/': typeof AuthenticatedGameProfileIdIndexRoute
 }
@@ -161,6 +181,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/profile'
     | '/'
+    | '/game-profile/$id/codes'
     | '/game-profile/$id/screenshots'
     | '/game-profile/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -168,6 +189,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/profile'
     | '/'
+    | '/game-profile/$id/codes'
     | '/game-profile/$id/screenshots'
     | '/game-profile/$id'
   id:
@@ -176,6 +198,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/_authenticated/profile'
     | '/_authenticated/'
+    | '/_authenticated/game-profile/$id/codes'
     | '/_authenticated/game-profile/$id/screenshots'
     | '/_authenticated/game-profile/$id/'
   fileRoutesById: FileRoutesById
@@ -210,6 +233,7 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/profile",
         "/_authenticated/",
+        "/_authenticated/game-profile/$id/codes",
         "/_authenticated/game-profile/$id/screenshots",
         "/_authenticated/game-profile/$id/"
       ]
@@ -223,6 +247,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/": {
       "filePath": "_authenticated/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/game-profile/$id/codes": {
+      "filePath": "_authenticated/game-profile/$id/codes.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/game-profile/$id/screenshots": {
