@@ -13,6 +13,12 @@ import {
   insertResourceSchema,
   resource as resourceTable,
 } from "../db/schema/resource"
+import { redemptionCode as redemptionCodeTable } from "../db/schema/redemptionCode"
+import { z } from "zod"
+
+const createCodeSchema = z.object({
+  code: z.string().min(1, "Code is required"),
+})
 
 export const gameProfilesRoute = new Hono()
   .get("/", getUser, async (c) => {
@@ -279,3 +285,92 @@ export const gameProfilesRoute = new Hono()
       return c.json(result)
     }
   )
+  .get("/:id{[0-9]+}/codes", getUser, async (c) => {
+    const user = c.var.user
+    const gameProfileId = parseInt(c.req.param("id"))
+    console.log("my id", gameProfileId)
+    const ownership = await db
+      .select()
+      .from(gameProfileTable)
+      .where(
+        and(
+          eq(gameProfileTable.userId, user.id),
+          eq(gameProfileTable.id, gameProfileId)
+        )
+      )
+    if (!ownership || !ownership.length) {
+      throw new Error("Failed to get codes from profile")
+    }
+
+    const codes = await db
+      .select()
+      .from(redemptionCodeTable)
+      .where(eq(redemptionCodeTable.gameProfileId, gameProfileId))
+      .orderBy(desc(redemptionCodeTable.redeemedAt))
+    return c.json({ codes: codes })
+  })
+  .post(
+    "/:id{[0-9]+}/codes",
+    getUser,
+    zValidator("json", createCodeSchema),
+    async (c) => {
+      const user = c.var.user
+      const gameProfileId = parseInt(c.req.param("id"))
+      const body = await c.req.json()
+
+      if (!body.code || typeof body.code !== "string") {
+        throw new Error("Invalid code")
+      }
+
+      const ownership = await db
+        .select()
+        .from(gameProfileTable)
+        .where(
+          and(
+            eq(gameProfileTable.userId, user.id),
+            eq(gameProfileTable.id, gameProfileId)
+          )
+        )
+
+      if (!ownership || !ownership.length) {
+        throw new Error("Unauthorized")
+      }
+
+      await db.insert(redemptionCodeTable).values({
+        gameProfileId: gameProfileId,
+        code: body.code,
+      })
+
+      return c.json({ success: true })
+    }
+  )
+  .delete("/:id{[0-9]+}/codes/:codeId{[0-9]+}", getUser, async (c) => {
+    const user = c.var.user
+    const gameProfileId = parseInt(c.req.param("id"))
+    const codeId = parseInt(c.req.param("codeId"))
+
+    const ownership = await db
+      .select()
+      .from(gameProfileTable)
+      .where(
+        and(
+          eq(gameProfileTable.userId, user.id),
+          eq(gameProfileTable.id, gameProfileId)
+        )
+      )
+
+    if (!ownership.length) {
+      throw new Error("Unauthorized")
+    }
+
+    await db
+      .delete(redemptionCodeTable)
+      .where(
+        and(
+          eq(redemptionCodeTable.id, codeId),
+          eq(redemptionCodeTable.gameProfileId, gameProfileId)
+        )
+      )
+
+    return c.json({ success: true })
+  })
