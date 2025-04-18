@@ -51,7 +51,7 @@ function RouteComponent() {
 
   return (
     <>
-      <SubNav id={id} />
+      {/* <SubNav id={id} />
       <div className="min-h-full bg-background text-text p-6 flex flex-col">
         <div className="flex justify-between items-center mb-6 gap-x-6">
           <div className="flex flex-col gap-2">
@@ -111,7 +111,7 @@ function RouteComponent() {
             </Button>
           </CardFooter>
         </Card>
-      </div>
+      </div> */}
     </>
   )
 }

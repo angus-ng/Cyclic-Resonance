@@ -226,7 +226,7 @@ export function SubNav({ id }: { id: string }) {
           </span>
           <div className="absolute left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-300"></div>
         </Link>
-        <Link
+        {/* <Link
           to={`/game-profile/${id}/screenshots`}
           className="relative text-text hover:text-accent group [&.active]:text-accent"
         >
@@ -234,7 +234,7 @@ export function SubNav({ id }: { id: string }) {
             Screenshots
           </span>
           <div className="absolute left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-300"></div>
-        </Link>
+        </Link> */}
       </nav>
     </div>
   )
